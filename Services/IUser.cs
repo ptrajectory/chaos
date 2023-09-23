@@ -13,7 +13,7 @@ namespace chaos.Services
 
         public GetUser? getUser(string UserID);
 
-        public UpdateUser updateUser(string UserID, UpdateUser UpdatedUserData);
+        public GetUser? updateUser(string UserID, UpdateUser UpdatedUserData);
 
         public List<GetChannel> getUserChannels(string UserID);
     }

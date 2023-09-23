@@ -5,13 +5,15 @@ namespace chaos.Models
 {
 
     public class Participant {
-        public string ID {get; set;}
+        public string ID {get; set;} = String.Empty;
 
-        public string UserID {get; set;}
+        public string UserID {get; set;}= String.Empty;
 
-        public string ChannelID { get; set;}
+        public string ChannelID { get; set;}= String.Empty;
 
         public DateTime CreatedAt = DateTime.Now;
+
+        public Participant(){}
 
         public Participant(string PID, string UsrID, string ChID){
             this.ID = PID;

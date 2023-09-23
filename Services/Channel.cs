@@ -14,7 +14,7 @@ namespace chaos.Services
 {
     public class Channel : IChannel
     {
-        ChatContext context;
+        private readonly ChatContext context;
 
         Mapper UpdateChannelMapper = new Mapper(new MapperConfiguration((cfg)=>cfg.CreateMap<Dtos.Channel.UpdateChannel, Models.Channel>()));
 
@@ -54,17 +54,20 @@ namespace chaos.Services
         public GetChannel? getChannel(string ChannelID)
         {
             Models.Channel? channel =  this.context.CHANNEL.Find(ChannelID);
-            Dtos.Channel.GetChannel dto = new Dtos.Channel.GetChannel();
-            GetChannelMapper.Map(channel, dto);
+
+            var dto = GetChannelMapper.Map<GetChannel>(channel);
             return dto;
         }
 
-        public GetMessage getMessage(string MessageID)
+        public GetMessage? getMessage(string MessageID)
         {
-            Dtos.Message.GetMessage dto = new Dtos.Message.GetMessage();
             Models.Message? msg = this.context.MESSAGE.Find(MessageID);
-            GetMessageMapper.Map(msg, dto);
-            return dto;
+            if(null != msg){
+                var dto = GetMessageMapper.Map<GetMessage>(msg);
+                return dto;
+            }
+
+            return null;
         }
 
         public List<GetMessage> getMessages(string ChannelID)
@@ -73,19 +76,15 @@ namespace chaos.Services
             var channel_messages = this.context.MESSAGE.Where((message)=>message.ChannelID == ChannelID);
 
             foreach(var message in channel_messages){
-
-                GetMessage dto = new GetMessage();
-                GetMessageMapper.Map(message, dto);
+                var dto = GetMessageMapper.Map<GetMessage>(message);
                 messages.Append(dto);
-
             }
 
             return messages;
         }
 
         public GetChannel? updateChannel(string ChannelID, UpdateChannel UpdatedChannelData)
-        {   
-            GetChannel dto = new GetChannel();
+        {  
 
             Models.Channel? channel = this.context.CHANNEL.Find(ChannelID);
 
@@ -94,7 +93,7 @@ namespace chaos.Services
 
                 this.context.SaveChanges();
 
-                GetChannelMapper.Map(channel, dto);
+                var dto = GetChannelMapper.Map<GetChannel>(channel);
 
                 return dto;
             }
@@ -120,25 +119,29 @@ namespace chaos.Services
         {
             List<Dtos.Participant.GetParticipant> participants = new List<Dtos.Participant.GetParticipant>();
             foreach (var participant in this.context.PARTICIPANT.Where((participant)=>participant.ChannelID == ChannelID)) {
-                Dtos.Participant.GetParticipant dto = new Dtos.Participant.GetParticipant();
-                GetParticipantMapper.Map(participant, dto);
+                var dto = GetParticipantMapper.Map<GetParticipant>(participant);
                 participants.Append(dto);
             }
 
             return participants;
         }
 
-        public void deleteChannelParticipant(string ParticipantID)
+        public GetParticipant? deleteChannelParticipant(string ParticipantID)
         {
             Participant? participant = this.context.PARTICIPANT.Find(ParticipantID);
 
             if(null != participant){
-
                 this.context.PARTICIPANT.Remove(participant);
 
                 this.context.SaveChanges();
 
+                var dto = GetParticipantMapper.Map<GetParticipant>(participant);
+
+                return dto;
+
             }
+
+            return null;
         }
 
     }

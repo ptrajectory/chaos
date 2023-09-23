@@ -10,15 +10,15 @@ namespace chaos.Dtos.User
 
         public string ID = String.Empty;
 
-        public string FirstName{get; set;} = String.Empty;
+        public string? FirstName{get; set;} = String.Empty;
 
-        public string LastName{get;set;} = String.Empty;
+        public string? LastName{get;set;} = String.Empty;
 
-        public string UserName{get; set;} = String.Empty;
+        public string? UserName{get; set;} = String.Empty;
 
-        public string Avatar{get; set;} = String.Empty;
+        public string? Avatar{get; set;} = String.Empty;
 
-        public string Bio{get; set;} = String.Empty;
+        public string? Bio{get; set;} = String.Empty;
 
         public DateTime CreatedAt = DateTime.Now;
         

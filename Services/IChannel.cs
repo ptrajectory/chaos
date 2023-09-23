@@ -27,7 +27,7 @@ namespace chaos.Services
 
         public List<GetParticipant> getChannelParticipants(string ChannelID);
 
-        public void deleteChannelParticipant(string ParticipantID);
+        public GetParticipant? deleteChannelParticipant(string ParticipantID);
 
 
     }
