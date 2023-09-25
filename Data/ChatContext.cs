@@ -22,6 +22,10 @@ namespace chaos.Models
 
         public DbSet<Participant> PARTICIPANT {get; set;} 
 
+        public DbSet<MediaUploads> MEDIA_UPLOADS {get; set;}
+
+        public DbSet<MessageMedia> MESSAGE_MEDIA {get; set;}
+
 
         
     }

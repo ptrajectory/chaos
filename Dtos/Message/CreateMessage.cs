@@ -10,5 +10,7 @@ namespace chaos.Dtos.Message
         public string SenderID {get; set;} = String.Empty;
         public string ChannelID {get; set;} = String.Empty;
         public string? TextContent {get;set;}
+
+        public List<string> Uploads {get;set;} = new List<string>();
     }
 }

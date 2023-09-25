@@ -35,6 +35,13 @@ namespace chaos.utils
 
             return idBuilder.ToString();
         }
+
+        static public async Task<byte[]> ConvertFormFileToByteArray(IFormFile file){
+            using(var memoryStream = new MemoryStream()){
+                await file.CopyToAsync(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
         
     }
 }

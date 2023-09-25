@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using chaos.Models;
@@ -11,9 +12,11 @@ using chaos.Models;
 namespace chaos.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    partial class ChatContextModelSnapshot : ModelSnapshot
+    [Migration("20230925115612_added fks for media and message models")]
+    partial class addedfksformediaandmessagemodels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,29 +56,6 @@ namespace chaos.Migrations
                     b.ToTable("CHANNEL");
                 });
 
-            modelBuilder.Entity("chaos.Models.MediaUploads", b =>
-                {
-                    b.Property<string>("ID")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FileUrl")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("OwnerId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("MEDIA_UPLOADS");
-                });
-
             modelBuilder.Entity("chaos.Models.Message", b =>
                 {
                     b.Property<string>("ID")
@@ -102,26 +82,6 @@ namespace chaos.Migrations
                     b.HasIndex("SenderID");
 
                     b.ToTable("MESSAGE");
-                });
-
-            modelBuilder.Entity("chaos.Models.MessageMedia", b =>
-                {
-                    b.Property<string>("ID")
-                        .HasColumnType("text");
-
-                    b.Property<string>("MediaID")
-                        .HasColumnType("text");
-
-                    b.Property<string>("MessageID")
-                        .HasColumnType("text");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("MediaID");
-
-                    b.HasIndex("MessageID");
-
-                    b.ToTable("MESSAGE_MEDIA");
                 });
 
             modelBuilder.Entity("chaos.Models.Participant", b =>
@@ -199,21 +159,6 @@ namespace chaos.Migrations
                     b.Navigation("Channel");
 
                     b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("chaos.Models.MessageMedia", b =>
-                {
-                    b.HasOne("chaos.Models.MediaUploads", "MediaUpload")
-                        .WithMany()
-                        .HasForeignKey("MediaID");
-
-                    b.HasOne("chaos.Models.Message", "Message")
-                        .WithMany()
-                        .HasForeignKey("MessageID");
-
-                    b.Navigation("MediaUpload");
-
-                    b.Navigation("Message");
                 });
 
             modelBuilder.Entity("chaos.Models.Participant", b =>

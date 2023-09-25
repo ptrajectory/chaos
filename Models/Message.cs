@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace chaos.Models
 {
@@ -27,6 +22,7 @@ namespace chaos.Models
 
         public string? TextContent {get;set;}= String.Empty;
 
+        public List<MessageMedia> MessageMedia = new List<MessageMedia>();
         public Message(){}
 
         public  Message(string MsgId, string SenderID, string ChannelID){

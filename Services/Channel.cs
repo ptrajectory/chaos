@@ -17,6 +17,7 @@ namespace chaos.Services
     public class Channel : IChannel
     {
         private readonly ChatContext context;
+        private readonly IUpload upload;
 
         Mapper CreateChannelMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Dtos.Channel.CreateChannel, Models.Channel>())
         );
@@ -49,8 +50,9 @@ namespace chaos.Services
         Mapper GetUserMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Models.User, Dtos.User.GetUser>()));
 
 
-        public Channel(ChatContext _context){
+        public Channel(ChatContext _context, IUpload upload){
             this.context = _context;
+            this.upload = upload;
         }
         public string addMessage(string ChannelID, CreateMessage NewChannelMessage)
         {
@@ -61,6 +63,11 @@ namespace chaos.Services
 
             this.context.MESSAGE.Add(msg);
             this.context.SaveChanges();
+
+            foreach(var upload_id in NewChannelMessage.Uploads){
+
+                this.upload.addMessageMedia(upload_id, message_id);
+            }
 
             return message_id;
         }
