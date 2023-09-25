@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using chaos.Dtos.Channel;
 using chaos.Dtos.Message;
 using chaos.Dtos.Participant;
+using chaos.Dtos.User;
 using chaos.Models;
 
 namespace chaos.Services
@@ -25,7 +26,7 @@ namespace chaos.Services
 
         public string addParticipant(string ChannelID, CreateParticipant NewParticipantData);
 
-        public List<GetParticipant> getChannelParticipants(string ChannelID);
+        public List<GetUser> getChannelParticipants(string ChannelID);
 
         public GetParticipant? deleteChannelParticipant(string ParticipantID);
 

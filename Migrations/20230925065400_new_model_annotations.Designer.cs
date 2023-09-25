@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using chaos.Models;
@@ -11,9 +12,11 @@ using chaos.Models;
 namespace chaos.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    partial class ChatContextModelSnapshot : ModelSnapshot
+    [Migration("20230925065400_new_model_annotations")]
+    partial class new_model_annotations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,8 +51,6 @@ namespace chaos.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CreatorID");
-
                     b.ToTable("CHANNEL");
                 });
 
@@ -74,10 +75,6 @@ namespace chaos.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ChannelID");
-
-                    b.HasIndex("SenderID");
-
                     b.ToTable("MESSAGE");
                 });
 
@@ -95,10 +92,6 @@ namespace chaos.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("ChannelID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("PARTICIPANT");
                 });
@@ -126,64 +119,6 @@ namespace chaos.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("USER");
-                });
-
-            modelBuilder.Entity("chaos.Models.Channel", b =>
-                {
-                    b.HasOne("chaos.Models.User", "User")
-                        .WithMany("CreatedChannels")
-                        .HasForeignKey("CreatorID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("chaos.Models.Message", b =>
-                {
-                    b.HasOne("chaos.Models.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("chaos.Models.User", "Sender")
-                        .WithMany("Messages")
-                        .HasForeignKey("SenderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Channel");
-
-                    b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("chaos.Models.Participant", b =>
-                {
-                    b.HasOne("chaos.Models.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("chaos.Models.User", "User")
-                        .WithMany("JoinedChannels")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Channel");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("chaos.Models.User", b =>
-                {
-                    b.Navigation("CreatedChannels");
-
-                    b.Navigation("JoinedChannels");
-
-                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

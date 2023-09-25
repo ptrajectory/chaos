@@ -5,6 +5,7 @@ using chaos.Dtos.Channel;
 using chaos.Dtos.User;
 using chaos.Models;
 using chaos.utils;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace chaos.Services {
@@ -13,21 +14,27 @@ namespace chaos.Services {
     {
         ChatContext context;
 
-        Mapper CreateUserMapper = new Mapper(new MapperConfiguration((cfg) => cfg.CreateMap<Models.User, Dtos.User.CreateUser>()));
+        IMapper mapper;
 
-        Mapper UpdateUserMapper = new Mapper(new MapperConfiguration(cfg => cfg.CreateMap<Dtos.User.UpdateUser, Models.User>()));
+        Mapper CreateUserMapper = new Mapper(new MapperConfiguration((cfg) => cfg.CreateMap< Dtos.User.CreateUser, Models.User>()));
+
+        Mapper UpdateUserMapper = new Mapper(new MapperConfiguration(cfg => cfg.CreateMap<Dtos.User.UpdateUser, Models.User>()
+        .ForAllMembers(opts => opts.Condition((src, dest, srcMember)=> srcMember != null))
+        ));
 
         Mapper GetUserMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Models.User, Dtos.User.GetUser>()));
 
         Mapper GetChannelMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Models.Channel, Dtos.Channel.GetChannel>()));
 
-        public User(ChatContext _context){
+        public User(ChatContext _context, IMapper _mapper){
             this.context = _context;
+            this.mapper = _mapper;
         }
         public string createUser(CreateUser NewUserData)
         {
             string user_id = Utils.GenerateUniqueID("usr");
             var NewUser = CreateUserMapper.Map<Models.User>(NewUserData);
+            NewUser.ID = user_id;
             this.context.USER.Add(NewUser);
             this.context.SaveChanges();
 
@@ -48,18 +55,12 @@ namespace chaos.Services {
 
         public List<GetChannel> getUserChannels(string UserID)
         {
+            var userChannels = context.PARTICIPANT
+            .Where(participant => participant.UserID == UserID)
+            .Select(participant => participant.Channel)
+            .ToList();
 
-            List<GetChannel> channels = new List<GetChannel>();
-            var participating_in = this.context.PARTICIPANT.Where((participant)=> participant.UserID == UserID);
-            var user_channels = this.context.CHANNEL.Where((channel)=>participating_in.Any(participation => participation.ChannelID == channel.ID)); 
-
-            foreach(var channel in user_channels){
-
-                var dto = GetChannelMapper.Map<GetChannel>(channel);
-
-                channels.Add(dto);
-
-            }
+            var channels = GetChannelMapper.Map<List<GetChannel>>(userChannels);
 
             return channels;
         }
@@ -69,7 +70,6 @@ namespace chaos.Services {
             
             var user = this.context.USER.Find(UserID);
 
-            if(user == null) return null;
             UpdateUserMapper.Map(UpdatedUserData, user);
             this.context.SaveChanges();
 

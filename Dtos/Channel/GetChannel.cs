@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using chaos.Dtos.User;
 
 namespace chaos.Dtos.Channel
 {
@@ -21,5 +22,7 @@ namespace chaos.Dtos.Channel
         public string? Icon {get; set;} = String.Empty;
 
         public string? Banner {get; set;} = String.Empty;
+
+        public GetUser? User{get;set;}
     }
 }

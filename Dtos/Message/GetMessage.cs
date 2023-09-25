@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using chaos.Dtos.Channel;
+using chaos.Dtos.User;
 
 namespace chaos.Dtos.Message
 {
@@ -15,6 +17,10 @@ namespace chaos.Dtos.Message
 
         public string ChannelID {get; set;} = String.Empty;
         public string? TextContent {get;set;}
+
+        public GetUser? Sender {get;set;}
+
+        public GetChannel? Channel {get; set;}
         
     }
 }

@@ -6,8 +6,10 @@ using AutoMapper;
 using chaos.Dtos.Channel;
 using chaos.Dtos.Message;
 using chaos.Dtos.Participant;
+using chaos.Dtos.User;
 using chaos.Models;
 using chaos.utils;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace chaos.Services
@@ -16,15 +18,35 @@ namespace chaos.Services
     {
         private readonly ChatContext context;
 
-        Mapper UpdateChannelMapper = new Mapper(new MapperConfiguration((cfg)=>cfg.CreateMap<Dtos.Channel.UpdateChannel, Models.Channel>()));
+        Mapper CreateChannelMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Dtos.Channel.CreateChannel, Models.Channel>())
+        );
 
-        Mapper UpdateMessageMapper = new Mapper(new MapperConfiguration((cfg)=>cfg.CreateMap<Dtos.Message.UpdateMessage, Models.Message>()));
+        Mapper UpdateChannelMapper = new Mapper(new MapperConfiguration((cfg)=>cfg.CreateMap<Dtos.Channel.UpdateChannel, Models.Channel>()
+            .ForAllMembers((opts)=> opts.Condition((src, dest, srcMember)=> srcMember != null ))
+        ));
 
-        Mapper GetParticipantMapper = new Mapper(new MapperConfiguration((cfg)=>cfg.CreateMap<Models.Participant, Dtos.Participant.GetParticipant>()) );
+        Mapper UpdateMessageMapper = new Mapper(new MapperConfiguration((cfg)=>cfg.CreateMap<Dtos.Message.UpdateMessage, Models.Message>()
+            .ForAllMembers((opts)=> opts.Condition((src, dest, srcMember)=> srcMember != null))
+        ));
 
-        Mapper GetMessageMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Models.Message, Dtos.Message.GetMessage>()));
+        Mapper GetParticipantMapper = new Mapper(new MapperConfiguration((cfg)=>{
+            cfg.CreateMap<Models.User, Dtos.User.GetUser>();
+            cfg.CreateMap<Models.Channel, GetChannel>();
+            cfg.CreateMap<Models.Participant, Dtos.Participant.GetParticipant>();
+        } ) );
 
-        Mapper GetChannelMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Models.Channel, Dtos.Channel.GetChannel>()));
+        Mapper GetMessageMapper = new Mapper(new MapperConfiguration((cfg)=>{ 
+            cfg.CreateMap<Models.User, GetUser>();
+            cfg.CreateMap<Models.Channel, GetChannel>();
+            cfg.CreateMap<Models.Message, Dtos.Message.GetMessage>();
+        }));
+
+        Mapper GetChannelMapper = new Mapper(new MapperConfiguration((cfg)=>{ 
+            cfg.CreateMap<Models.User, GetUser>();
+            cfg.CreateMap<Models.Channel, Dtos.Channel.GetChannel>();
+        }));
+
+        Mapper GetUserMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Models.User, Dtos.User.GetUser>()));
 
 
         public Channel(ChatContext _context){
@@ -46,14 +68,19 @@ namespace chaos.Services
         public string createChannel(CreateChannel NewChannelData)
         {
             string channel_id = Utils.GenerateUniqueID("chn");
-            this.context.CHANNEL.Add(new Models.Channel(channel_id,NewChannelData.CreatorID));
+            var channel = CreateChannelMapper.Map<Models.Channel>(NewChannelData);
+            channel.ID = channel_id;
+            this.context.CHANNEL.Add(channel);
             this.context.SaveChanges();
             return channel_id;
         }
 
         public GetChannel? getChannel(string ChannelID)
         {
-            Models.Channel? channel =  this.context.CHANNEL.Find(ChannelID);
+            Models.Channel? channel =  this.context.CHANNEL
+            .Include(chn => chn.User)
+            .FirstOrDefault(chn => chn.ID == ChannelID);
+
 
             var dto = GetChannelMapper.Map<GetChannel>(channel);
             return dto;
@@ -61,7 +88,12 @@ namespace chaos.Services
 
         public GetMessage? getMessage(string MessageID)
         {
-            Models.Message? msg = this.context.MESSAGE.Find(MessageID);
+            Models.Message? msg = this.context.MESSAGE
+            .Include(msg => msg.Channel)
+            .Include(msg => msg.Sender)
+            .FirstOrDefault(msg => msg.ID == MessageID);
+            
+            
             if(null != msg){
                 var dto = GetMessageMapper.Map<GetMessage>(msg);
                 return dto;
@@ -72,15 +104,12 @@ namespace chaos.Services
 
         public List<GetMessage> getMessages(string ChannelID)
         {
-            List<GetMessage> messages = new List<GetMessage>();
-            var channel_messages = this.context.MESSAGE.Where((message)=>message.ChannelID == ChannelID);
 
-            foreach(var message in channel_messages){
-                var dto = GetMessageMapper.Map<GetMessage>(message);
-                messages.Append(dto);
-            }
+            var channel_message = this.context.MESSAGE.
+            Where(msg => msg.ChannelID == ChannelID)
+            .Include(msg => msg.Sender);
 
-            return messages;
+            return GetMessageMapper.Map<List<GetMessage>>(channel_message);
         }
 
         public GetChannel? updateChannel(string ChannelID, UpdateChannel UpdatedChannelData)
@@ -115,15 +144,16 @@ namespace chaos.Services
 
         }
 
-        public List<GetParticipant> getChannelParticipants(string ChannelID)
+        public List<GetUser> getChannelParticipants(string ChannelID)
         {
-            List<Dtos.Participant.GetParticipant> participants = new List<Dtos.Participant.GetParticipant>();
-            foreach (var participant in this.context.PARTICIPANT.Where((participant)=>participant.ChannelID == ChannelID)) {
-                var dto = GetParticipantMapper.Map<GetParticipant>(participant);
-                participants.Append(dto);
-            }
+            var channelParticipants = context.PARTICIPANT
+            .Where(participant => participant.ChannelID == ChannelID)
+            .Select(participant => participant.User)
+            .ToList();
 
-            return participants;
+            return GetUserMapper.Map<List<GetUser>>(channelParticipants);
+
+            
         }
 
         public GetParticipant? deleteChannelParticipant(string ParticipantID)

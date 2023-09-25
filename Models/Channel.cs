@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq; 
 using System.Threading.Tasks;
 
@@ -7,13 +9,16 @@ namespace chaos.Models
 {
     public class Channel
     {
-        
+        [Key]
         public string ID {get; set;} = String.Empty;
 
         public string CreatorID {get; set;} = String.Empty;
 
+        [ForeignKey("CreatorID")]
+        public User? User {get; set;}
 
-        public DateTime CreatedAt {get; set;} = DateTime.Now;
+        [Column(TypeName ="timestamptz")]
+        public DateTime CreatedAt {get; set;} = DateTime.UtcNow;
 
         public string? Name {get; set;} = String.Empty;
 
@@ -28,7 +33,7 @@ namespace chaos.Models
         public Channel(string ChannelID, string CreatorID){
             this.ID = ChannelID;
             this.CreatorID = CreatorID;
-            this.CreatedAt = DateTime.Now;
+            this.CreatedAt = DateTime.UtcNow;
         }   
     }
 }

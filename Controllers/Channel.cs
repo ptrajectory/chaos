@@ -3,6 +3,7 @@
 using chaos.Dtos.Channel;
 using chaos.Dtos.Message;
 using chaos.Dtos.Participant;
+using chaos.Dtos.User;
 using chaos.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,8 +51,8 @@ namespace chaos.Controllers {
 
 
         [HttpGet("{channelId}/participants")]
-        public ActionResult<List<GetParticipant>> getChannelParticipants(string channelId) {
-            List<GetParticipant> participants = this.channel.getChannelParticipants(channelId);
+        public ActionResult<List<GetUser>> getChannelParticipants(string channelId) {
+            List<GetUser> participants = this.channel.getChannelParticipants(channelId);
             return Ok(participants);
         }
 
@@ -63,7 +64,7 @@ namespace chaos.Controllers {
         }
 
 
-        [HttpPost("{channleId}/messages")]
+        [HttpPost("{channelId}/messages")]
         public ActionResult<string> addMessage(string channelId, [FromBody] CreateMessage NewMessage){
             string message_id = this.channel.addMessage(channelId,NewMessage);
             return Ok(message_id);
@@ -74,7 +75,7 @@ namespace chaos.Controllers {
         public ActionResult<GetMessage?> getMessage(string channelId, string messageId){
             GetMessage? message = this.channel.getMessage(messageId);
 
-            return message;
+            return Ok(message);
         }
 
 
