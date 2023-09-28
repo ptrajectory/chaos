@@ -20,7 +20,11 @@ namespace chaos.Dtos.User
 
         public string? Bio{get; set;} = String.Empty;
 
-        public DateTime CreatedAt = DateTime.Now;
+        public DateTime CreatedAt = DateTime.UtcNow;
+
+        public string? AppID {get; set;}
+
+        public string? OrgID {get; set;}
         
     }
 }

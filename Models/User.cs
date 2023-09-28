@@ -25,6 +25,16 @@ namespace chaos.Models
         [Column(TypeName = "timestamptz")]
         public DateTime CreatedAt = DateTime.UtcNow;
 
+        public string? AppID {get; set;}
+
+        public string? OrgID {get;set;}
+
+        [ForeignKey("AppID")]
+        public Apps? App {get;set;} 
+
+        [ForeignKey("OrgID")]
+        public Organization? Organization {get;set;}
+
         public List<Channel> CreatedChannels{get;set;} = new List<Channel>();
 
         public List<Message> Messages{get;set;} = new List<Message>();

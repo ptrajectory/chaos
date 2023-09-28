@@ -17,5 +17,9 @@ namespace chaos.Dtos.User
         public string? Avatar{get; set;} = String.Empty;
 
         public string? Bio{get; set;} = String.Empty;
+
+        public string? AppID {get; set;}
+
+        public string? OrgID {get; set;}
     }
 }

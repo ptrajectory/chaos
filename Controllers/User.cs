@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace chaos.Controllers
 {
     [ApiController]
-    [Route("api/users")]
+    [Route("api/organizations/{organization_id}/apps/{app_id}/users")]
     public class User: ControllerBase
     {
         
@@ -21,7 +21,9 @@ namespace chaos.Controllers
         }
 
         [HttpPost]
-        public ActionResult<string> createUser([FromBody] CreateUser NewUserData){
+        public ActionResult<string> createUser(string organization_id, string app_id, [FromBody] CreateUser NewUserData){
+            NewUserData.AppID = app_id;
+            NewUserData.OrgID = organization_id;
             string id = this.user.createUser(NewUserData);
 
             return Ok(id);
@@ -29,7 +31,7 @@ namespace chaos.Controllers
 
 
         [HttpGet("{userId}")]
-        public ActionResult<GetUser?> getUser(string userId){
+        public ActionResult<GetUser?> getUser(string organization_id, string app_id, string userId){
 
             GetUser? user = this.user.getUser(userId);
             Console.WriteLine($"Here is the user {user}");
@@ -38,14 +40,14 @@ namespace chaos.Controllers
 
         
         [HttpPatch("{userId}")]
-        public ActionResult<GetUser?> updateUser(string userId, [FromBody] UpdateUser data) {
+        public ActionResult<GetUser?> updateUser(string organization_id, string app_id, string userId, [FromBody] UpdateUser data) {
             GetUser? updatedUser = this.user.updateUser(userId, data);
             return Ok(updatedUser);
         }
 
 
         [HttpGet("channels/{userId}")]
-        public ActionResult<GetChannel> getUserChannels(string userId){
+        public ActionResult<GetChannel> getUserChannels(string organization_id, string app_id, string userId){
             List<GetChannel> channels = this.user.getUserChannels(userId);
             return Ok(channels);
         }

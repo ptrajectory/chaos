@@ -26,6 +26,10 @@ namespace chaos.Models
 
         public DbSet<MessageMedia> MESSAGE_MEDIA {get; set;}
 
+        public DbSet<Organization> ORGANIZATION {get;set;}
+
+        public DbSet<Apps> APPS {get;set;}
+
 
         
     }

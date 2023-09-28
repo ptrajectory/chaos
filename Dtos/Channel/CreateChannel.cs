@@ -17,5 +17,9 @@ namespace chaos.Dtos.Channel
         public string? Icon {get; set;} = String.Empty;
 
         public string? Banner {get; set;} = String.Empty;
+
+        public string? AppID;
+
+        public string? OrgID;
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using chaos.Models;
@@ -11,9 +12,11 @@ using chaos.Models;
 namespace chaos.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    partial class ChatContextModelSnapshot : ModelSnapshot
+    [Migration("20230927133726_add users<->app link")]
+    partial class addusersapplink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,16 +73,11 @@ namespace chaos.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<string>("OrgID")
-                        .HasColumnType("text");
-
                     b.HasKey("ID");
 
                     b.HasIndex("AppID");
 
                     b.HasIndex("CreatorID");
-
-                    b.HasIndex("OrgID");
 
                     b.ToTable("CHANNEL");
                 });
@@ -164,7 +162,7 @@ namespace chaos.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -219,17 +217,12 @@ namespace chaos.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
-                    b.Property<string>("OrgID")
-                        .HasColumnType("text");
-
                     b.Property<string>("UserName")
                         .HasColumnType("text");
 
                     b.HasKey("ID");
 
                     b.HasIndex("AppID");
-
-                    b.HasIndex("OrgID");
 
                     b.ToTable("USER");
                 });
@@ -255,13 +248,7 @@ namespace chaos.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("chaos.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrgID");
-
                     b.Navigation("App");
-
-                    b.Navigation("Organization");
 
                     b.Navigation("User");
                 });
@@ -325,13 +312,7 @@ namespace chaos.Migrations
                         .WithMany()
                         .HasForeignKey("AppID");
 
-                    b.HasOne("chaos.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrgID");
-
                     b.Navigation("App");
-
-                    b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("chaos.Models.User", b =>

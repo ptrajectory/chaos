@@ -28,6 +28,16 @@ namespace chaos.Models
 
         public string? Banner {get; set;} = String.Empty;
 
+        public string? AppID {get;set;}
+
+        [ForeignKey("AppID")]
+        public Apps? App {get;set;}
+
+        public string? OrgID {get;set;}
+
+        [ForeignKey("OrgID")]
+        public Organization? Organization {get;set;}
+
         public Channel(){}
 
         public Channel(string ChannelID, string CreatorID){

@@ -19,13 +19,15 @@ var supabaseOptions = new Supabase.SupabaseOptions
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ChatContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IChannel, chaos.Services.Channel>();
 builder.Services.AddScoped<IUser, chaos.Services.User>();
+builder.Services.AddScoped<IOrganization, chaos.Services.Organization>();
+builder.Services.AddScoped<IApps, chaos.Services.App>();
 if(supabase_url != null  && supabase_api_key != null){
     builder.Services.AddSingleton<Supabase.Client>(new Supabase.Client(supabase_url, supabase_api_key, supabaseOptions));
 }
 builder.Services.AddScoped<IUpload, SupabaseUpload>();
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
