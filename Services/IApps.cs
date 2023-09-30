@@ -13,5 +13,7 @@ public interface IApps {
 
     public GetApp? updateApp(string AppID, UpdateApp NewAppData);
 
+    public GetAppCredentials? getAppCredentials(string AppID);
+
 }
 

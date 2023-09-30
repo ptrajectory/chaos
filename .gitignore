@@ -3,3 +3,4 @@ obj
 appsettings.*
 dntcpy
 .env
+key

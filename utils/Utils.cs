@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 
 namespace chaos.utils
 {
@@ -42,6 +46,104 @@ namespace chaos.utils
                 return memoryStream.ToArray();
             }
         }
+
+        static public string EncryptForStorage(string token)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {   
+                if(AppEnvironment.ENCRYPTION_KEY is null) throw new Exception("ENCRYPTION KEY HAS NOT BEEN PROVIDED");
+                
+                aesAlg.Key = Encoding.UTF8.GetBytes(AppEnvironment.ENCRYPTION_KEY);
+
+                aesAlg.IV = new byte[16];
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using(MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(token);
+                        }
+                    }
+                    return Convert.ToHexString(msEncrypt.ToArray());
+                }
+
+            }
+        }
+
+
+        static public string DecryptFromStorage(string encryptedText)
+        {
+            if(AppEnvironment.ENCRYPTION_KEY is null) throw new Exception("ENCRYPTION KEY HAS NOT BEEN PROVIDED");
+
+            using(Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(AppEnvironment.ENCRYPTION_KEY);
+                aesAlg.IV = new byte[16];
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromHexString(encryptedText)))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            return srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+
+            }
+
+        }
+
+
+        public static string GenerateEncryptedJwt(string owner, string? prefix){
+            var rsaKey = RSA.Create();
+            rsaKey.ImportRSAPrivateKey(AppEnvironment.APP_RSA_KEY_PAIR, out _);
+
+            var key = new RsaSecurityKey(rsaKey);
+
+            var handler = new JsonWebTokenHandler();
+
+            var token = handler.CreateToken(new SecurityTokenDescriptor(){
+                Subject = new ClaimsIdentity(new [] {
+                    new Claim("owner", owner),
+                    new Claim("scope", "app"),
+                    new Claim("environment", prefix ?? "")
+                }),
+                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256),
+                Expires = DateTime.MaxValue
+            });
+
+            var encrypted = EncryptForStorage(token);
+
+            if(prefix is not null){
+                return prefix + "_" + encrypted;
+            }
+ 
+            return encrypted;
+        }
+
+
+        public static string GetDecryptedJwt(string encryptedText)
+        {
+            Console.WriteLine($"DO ANY CONTAIN:: {encryptedText.Contains("prod")} || {encryptedText.Contains("test")}");
+            if(encryptedText.Contains("prod") || encryptedText.Contains("test"))
+            {
+                var without_prefix = encryptedText.Remove(0, 5);
+                Console.WriteLine(without_prefix);
+                return DecryptFromStorage(without_prefix);
+            }
+            return DecryptFromStorage(encryptedText);
+        }
+
+
         
     }
 }

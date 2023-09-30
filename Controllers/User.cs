@@ -2,15 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using chaos.AuthRepository;
 using chaos.Dtos.Channel;
 using chaos.Dtos.User;
 using chaos.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace chaos.Controllers
 {
     [ApiController]
     [Route("api/organizations/{organization_id}/apps/{app_id}/users")]
+    [Authorize]
+    [RequiresClaim(claimName: IdentityData.OwnerClaimName, param: "app_id", claimValue: null)]
     public class User: ControllerBase
     {
         

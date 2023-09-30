@@ -1,13 +1,16 @@
 
 
+using chaos.AuthRepository;
 using chaos.Models;
 using chaos.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Upload{
 
     [ApiController]
     [Route("/api/uploads")]
+    [Authorize]
     public class Upload: ControllerBase {
 
         IUpload client;

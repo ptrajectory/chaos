@@ -1,7 +1,9 @@
 
 using AutoMapper;
+using chaos.AuthRepository;
 using chaos.Dtos.App;
 using chaos.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Supabase.Core.Extensions;
 
@@ -21,7 +23,8 @@ public class AppController: ControllerBase
     }
 
 
-
+    [Authorize]
+    [RequiresClaim(IdentityData.FriendClaimName, "true")]
     [HttpPost]
     public ActionResult<string> createApp(string organization_id, CreateApp app){
         app.OrgID = organization_id;
@@ -31,6 +34,8 @@ public class AppController: ControllerBase
 
     }
 
+    [Authorize]
+    [RequiresClaim(IdentityData.FriendClaimName, "true")]
     [HttpGet("{id}")]
     public ActionResult<GetApp> getApp(string organization_id, string id){
 
@@ -40,6 +45,8 @@ public class AppController: ControllerBase
     }
 
 
+    [Authorize]
+    [RequiresClaim(IdentityData.FriendClaimName, "true")]
     [HttpPatch("{id}")]
     public ActionResult<GetApp> updateApp(string organization_id, string id, UpdateApp UpdatedData){
 
@@ -47,6 +54,17 @@ public class AppController: ControllerBase
 
         return Ok(app);
 
+    }
+
+
+    [Authorize]
+    [RequiresClaim(IdentityData.FriendClaimName, "true")]
+    [HttpGet("{id}/credentials")]
+    public ActionResult<GetAppCredentials?> getAppCredentials(string id)
+    {
+        var creds = this._app.getAppCredentials(id);
+
+        return Ok(creds);
     }
 
 }

@@ -16,6 +16,9 @@ public class Apps {
     [Column(TypeName ="timestamptz")]
     public DateTime CreatedAt {get;set;} = DateTime.UtcNow;
 
+    public string? TEST_CLIENT_SECRET {get; set;}
+
+    public string? CLIENT_SECRET {get; set;}
 
     public string? OrgID {get;set;}
 

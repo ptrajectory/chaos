@@ -54,7 +54,7 @@ public class Organization : IOrganization
 
         this._mapper.Map<UpdateOrganization, Models.Organization>(data, org);
 
-        this._context.SaveChangesAsync();
+        this._context.SaveChanges();
 
         var dto = this._mapper.Map<GetOrganization>(org);
 

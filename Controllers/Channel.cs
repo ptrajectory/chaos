@@ -6,11 +6,15 @@ using chaos.Dtos.Participant;
 using chaos.Dtos.User;
 using chaos.Services;
 using Microsoft.AspNetCore.Mvc;
+using chaos.AuthRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace chaos.Controllers {
 
     [ApiController]
     [Route("api/organizations/{organization_id}/apps/{app_id}/channels")]
+    [Authorize]
+    [RequiresClaim(claimName: IdentityData.OwnerClaimName, param: "app_id", claimValue: null)]
     public class Channel: ControllerBase
     {
 

@@ -1,7 +1,18 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
 using chaos.Models;
 using chaos.Services;
 using chaos;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Security.Cryptography;
+using chaos.utils;
+using Microsoft.IdentityModel.Tokens;
+using chaos.AuthRepository;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.Extensions.Options;
+using System.Reflection;
+using chaos.Swagger;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +27,33 @@ var supabaseOptions = new Supabase.SupabaseOptions
 
 
 // Add services to the container.
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(o => {
+    o.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ValidateLifetime = false,
+        RequireExpirationTime = false
+    };
+    var rsaKey = RSA.Create();
+
+    rsaKey.ImportRSAPrivateKey(AppEnvironment.APP_RSA_KEY_PAIR, out _);
+
+    o.Configuration = new OpenIdConnectConfiguration()
+    {
+        SigningKeys = {
+            new RsaSecurityKey(rsaKey)
+        }
+    };
+
+    o.MapInboundClaims = false;
+});
+
+builder.Services.AddAuthorization(options=>{
+    options.AddPolicy(IdentityData.FriendPolicyName, p => p.RequireClaim(IdentityData.FriendClaimName, "true"));
+});
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ChatContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -32,7 +70,17 @@ builder.Services.AddScoped<IUpload, SupabaseUpload>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Other configurations...
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+    c.OperationFilter<AddCustomHeaderParameter>();
+    
+});
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 var app = builder.Build();
 
@@ -46,6 +94,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
