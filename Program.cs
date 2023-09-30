@@ -62,6 +62,8 @@ builder.Services.AddScoped<IChannel, chaos.Services.Channel>();
 builder.Services.AddScoped<IUser, chaos.Services.User>();
 builder.Services.AddScoped<IOrganization, chaos.Services.Organization>();
 builder.Services.AddScoped<IApps, chaos.Services.App>();
+builder.Services.AddScoped<IAuthService, AuthServive>();
+builder.Services.AddScoped<AppResourcesAccessFilter>();
 if(supabase_url != null  && supabase_api_key != null){
     builder.Services.AddSingleton<Supabase.Client>(new Supabase.Client(supabase_url, supabase_api_key, supabaseOptions));
 }
@@ -94,8 +96,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.MapControllers();
 

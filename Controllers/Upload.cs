@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Upload{
-
     [ApiController]
     [Route("/api/uploads")]
     [Authorize]
@@ -19,6 +18,12 @@ namespace Upload{
             this.client = client;
         }
 
+        /// <summary>
+        /// Upload a user file
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
         [HttpPost("{userId}")] // Todo: temporary should replace with something else that will work
         public async Task<ActionResult<MediaUploads?>> uploadUserImage(string userId, IFormFile file){
             var media = await this.client.Upload(file, userId);

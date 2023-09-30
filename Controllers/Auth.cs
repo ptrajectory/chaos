@@ -8,9 +8,7 @@ namespace chaos.Controllers;
 
 [ApiController]
 [Route("api/organizations/{organization_id}/apps/{app_id}/authorize")]
-[AppResourcesAccessFilter]
-[Authorize]
-[RequiresClaim(claimName: IdentityData.OwnerClaimName, param: "app_id", claimValue: null)]
+
 public class AuthController: ControllerBase {
 
     IAuthService _auth_service;
@@ -34,12 +32,13 @@ public class AuthController: ControllerBase {
     ///     }
     ///     
     /// </remarks>
+    [AppResourcesAccessFilter]
     [HttpGet]
     public GetAccessToken? getAccessTokne(){
         var context = HttpContext;
         var app_id = context.User.FindFirst("owner")?.Value;
         var env = context.User.FindFirst("environment")?.Value;
-
+        Console.WriteLine($"APP ID:: {app_id}");
         if(app_id is null || env is null) {
 
             return null;

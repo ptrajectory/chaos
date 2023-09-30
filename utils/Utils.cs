@@ -133,7 +133,6 @@ namespace chaos.utils
 
         public static string GetDecryptedJwt(string encryptedText)
         {
-            Console.WriteLine($"DO ANY CONTAIN:: {encryptedText.Contains("prod")} || {encryptedText.Contains("test")}");
             if(encryptedText.Contains("prod") || encryptedText.Contains("test"))
             {
                 var without_prefix = encryptedText.Remove(0, 5);
@@ -141,6 +140,7 @@ namespace chaos.utils
                 return DecryptFromStorage(without_prefix);
             }
             return DecryptFromStorage(encryptedText);
+          
         }
 
 

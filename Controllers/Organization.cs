@@ -18,6 +18,11 @@ public class OrganizationController: ControllerBase {
         this._organization = organization;
     }
 
+    /// <summary>
+    /// Create a new organization
+    /// </summary>
+    /// <param name="NewOrgDetails"></param>
+    /// <returns></returns>
     [Authorize]
     [RequiresClaim(IdentityData.FriendClaimName, "true")]
     [HttpPost]
@@ -26,6 +31,11 @@ public class OrganizationController: ControllerBase {
         return Ok(organization_id);
     }
 
+    /// <summary>
+    /// Get an organization
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [Authorize]
     [RequiresClaim(IdentityData.FriendClaimName, "true")]
     [HttpGet]
@@ -34,8 +44,14 @@ public class OrganizationController: ControllerBase {
         var organization = this._organization.getOrganization(id);
 
         return Ok(organization);
-    }
+    }   
 
+    /// <summary>
+    /// Update an organization
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="UpdatedOrganizationData"></param>
+    /// <returns></returns>
     [Authorize]
     [RequiresClaim(IdentityData.FriendClaimName, "true")]
     [HttpPatch]

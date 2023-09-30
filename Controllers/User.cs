@@ -24,6 +24,13 @@ namespace chaos.Controllers
             this.user = _user;
         }
 
+        /// <summary>
+        /// Create an new user
+        /// </summary>
+        /// <param name="organization_id"></param>
+        /// <param name="app_id"></param>
+        /// <param name="NewUserData"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult<string> createUser(string organization_id, string app_id, [FromBody] CreateUser NewUserData){
             NewUserData.AppID = app_id;
@@ -34,6 +41,13 @@ namespace chaos.Controllers
         }
 
 
+        /// <summary>
+        /// Get A user
+        /// </summary>
+        /// <param name="organization_id"></param>
+        /// <param name="app_id"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         [HttpGet("{userId}")]
         public ActionResult<GetUser?> getUser(string organization_id, string app_id, string userId){
 
@@ -42,7 +56,14 @@ namespace chaos.Controllers
             return Ok(user);
         }
 
-        
+        /// <summary>
+        /// Update a user
+        /// </summary>
+        /// <param name="organization_id"></param>
+        /// <param name="app_id"></param>
+        /// <param name="userId"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPatch("{userId}")]
         public ActionResult<GetUser?> updateUser(string organization_id, string app_id, string userId, [FromBody] UpdateUser data) {
             GetUser? updatedUser = this.user.updateUser(userId, data);
@@ -50,6 +71,13 @@ namespace chaos.Controllers
         }
 
 
+        /// <summary>
+        /// Get All User Channels
+        /// </summary>
+        /// <param name="organization_id"></param>
+        /// <param name="app_id"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         [HttpGet("channels/{userId}")]
         public ActionResult<GetChannel> getUserChannels(string organization_id, string app_id, string userId){
             List<GetChannel> channels = this.user.getUserChannels(userId);
