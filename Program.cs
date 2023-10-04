@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.Extensions.Options;
 using System.Reflection;
 using chaos.Swagger;
+using chaos.Hubs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +65,7 @@ builder.Services.AddScoped<IOrganization, chaos.Services.Organization>();
 builder.Services.AddScoped<IApps, chaos.Services.App>();
 builder.Services.AddScoped<IAuthService, AuthServive>();
 builder.Services.AddScoped<AppResourcesAccessFilter>();
+builder.Services.AddSignalR();
 if(supabase_url != null  && supabase_api_key != null){
     builder.Services.AddSingleton<Supabase.Client>(new Supabase.Client(supabase_url, supabase_api_key, supabaseOptions));
 }
@@ -86,6 +88,10 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwa
 
 var app = builder.Build();
 
+app.UseRouting();
+app.UseStaticFiles();
+
+app.MapHub<ChatHub>("/chatters");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
