@@ -4,3 +4,4 @@ appsettings.*
 dntcpy
 .env
 key
+.wwwroot
