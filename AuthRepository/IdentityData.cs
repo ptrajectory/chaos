@@ -15,4 +15,8 @@ public static class IdentityData {
 
         public const string EnvironmentPolicyName = "Environment";
 
+        public const string UserPolicyName = "User";
+
+        public const string UserClaimName = "user";
+
 }

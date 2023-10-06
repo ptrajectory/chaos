@@ -21,11 +21,9 @@ public class AppResourcesAccessFilter : Attribute, IAuthorizationFilter
             return;
         }
 
-        Console.WriteLine($"GOT THE APP ID:: {APP_ID}");
 
         context.HttpContext.Request.Headers.TryGetValue("x-app-secret", out var APP_SECRET);
 
-        Console.WriteLine($"GOT THE APP SECRET:: {APP_SECRET}");
 
         if(APP_SECRET.IsNullOrEmpty())
         {
@@ -35,7 +33,6 @@ public class AppResourcesAccessFilter : Attribute, IAuthorizationFilter
 
         var token = utils.Utils.GetDecryptedJwt(APP_SECRET.ToString());
 
-        Console.WriteLine(token);
 
         if(token is null)
         {

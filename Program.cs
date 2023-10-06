@@ -13,6 +13,10 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.Extensions.Options;
 using System.Reflection;
 using chaos.Swagger;
+using chaos.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Http.Connections;
+using System.Security.Claims;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +34,28 @@ var supabaseOptions = new Supabase.SupabaseOptions
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(o => {
+    o.Events = new JwtBearerEvents(){
+        OnMessageReceived = (context) => 
+        {
+            var path = context.HttpContext.Request.Path;
+
+            if(path.StartsWithSegments("/chat-socket"))
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var bToken = context.Request.Headers.Authorization;
+
+
+                Console.WriteLine($"Access Token {accessToken} b:: {bToken}");
+
+                
+                if(context.Request.Query.ContainsKey("access_token")){
+                    context.Token = accessToken;
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+    };
     o.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateAudience = false,
@@ -64,6 +90,10 @@ builder.Services.AddScoped<IOrganization, chaos.Services.Organization>();
 builder.Services.AddScoped<IApps, chaos.Services.App>();
 builder.Services.AddScoped<IAuthService, AuthServive>();
 builder.Services.AddScoped<AppResourcesAccessFilter>();
+builder.Services.AddSingleton<IUserIdProvider, ChatHubIDProvider>();
+builder.Services.AddSignalR(o => {
+    o.AddFilter<ChatHubFilter>();
+});
 if(supabase_url != null  && supabase_api_key != null){
     builder.Services.AddSingleton<Supabase.Client>(new Supabase.Client(supabase_url, supabase_api_key, supabaseOptions));
 }
@@ -96,9 +126,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// app.UseAuthentication();
-// app.UseAuthorization();
-
+app.UseStaticFiles();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chat-socket", o => {
+    o.Transports = HttpTransportType.WebSockets;
+});
 
 app.Run();

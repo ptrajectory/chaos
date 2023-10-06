@@ -19,6 +19,6 @@ public class Organization {
     [Column(TypeName = "timestamptz")]
     public DateTime CreatedAt{get;set;} = DateTime.UtcNow; 
 
-    public List<Apps> Apps = new List<Apps>();
+    public List<Apps> Apps{get;set;} = new List<Apps>();
 
 }
