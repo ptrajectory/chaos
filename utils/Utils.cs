@@ -136,7 +136,6 @@ namespace chaos.utils
             if(encryptedText.Contains("prod") || encryptedText.Contains("test"))
             {
                 var without_prefix = encryptedText.Remove(0, 5);
-                Console.WriteLine(without_prefix);
                 return DecryptFromStorage(without_prefix);
             }
             return DecryptFromStorage(encryptedText);

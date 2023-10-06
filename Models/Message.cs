@@ -22,7 +22,7 @@ namespace chaos.Models
 
         public string? TextContent {get;set;}= String.Empty;
 
-        public List<MessageMedia> MessageMedia = new List<MessageMedia>();
+        public List<MessageMedia> MessageMedia{get; set;} = new List<MessageMedia>();
         public Message(){}
 
         public  Message(string MsgId, string SenderID, string ChannelID){

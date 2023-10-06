@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using chaos.Dtos.Channel;
+using chaos.Dtos.Media;
 using chaos.Dtos.User;
 
 namespace chaos.Dtos.Message
@@ -22,5 +23,6 @@ namespace chaos.Dtos.Message
 
         public GetChannel? Channel {get; set;}
         
+        public List<GetMessageMedia> MessageMedia{get;set;} = new List<GetMessageMedia>();
     }
 }
