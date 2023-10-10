@@ -17,6 +17,11 @@ namespace chaos.Models
 
         public string ChannelID {get; set;}= String.Empty;
 
+        public string? ReplyingTo {get; set;}
+
+        [ForeignKey("ReplyingTo")]
+        public Message ParentMessage {get;set;}
+
         [ForeignKey("ChannelID")]
         public Channel? Channel {get; set;}
 
