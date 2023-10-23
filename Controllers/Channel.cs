@@ -124,8 +124,8 @@ namespace chaos.Controllers {
         /// <param name="NewMessage"></param>
         /// <returns></returns>
         [HttpPost("{channelId}/messages")]
-        public ActionResult<string> addMessage(string organization_id, string app_id, string channelId, [FromBody] CreateMessage NewMessage){
-            string message_id = this.channel.addMessage(channelId,NewMessage);
+        public async Task<ActionResult<string>> addMessage(string organization_id, string app_id, string channelId, [FromBody] CreateMessage NewMessage){
+            string message_id = await this.channel.addMessage(channelId,NewMessage);
             return Ok(message_id);
         }
 

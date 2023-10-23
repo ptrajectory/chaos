@@ -33,12 +33,12 @@ public class AuthController: ControllerBase {
     ///     
     /// </remarks>
     [AppResourcesAccessFilter]
-    [HttpGet("{userId}")]
-    public GetAccessToken? getAccessTokne(string userId){
+    [HttpGet] 
+    public GetAccessToken? getAccessTokne([FromQueryAttribute] string? userId){
         var context = HttpContext;
         var app_id = context.User.FindFirst("owner")?.Value;
         var env = context.User.FindFirst("environment")?.Value;
-        Console.WriteLine($"APP ID:: {app_id}");
+        Console.WriteLine($"APP ID:: {app_id} User Id {userId} ");
         if(app_id is null || env is null) {
             return null;
         }

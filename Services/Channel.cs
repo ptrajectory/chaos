@@ -49,12 +49,15 @@ namespace chaos.Services
 
         Mapper GetUserMapper = new Mapper(new MapperConfiguration((cfg)=> cfg.CreateMap<Models.User, Dtos.User.GetUser>()));
 
+        IMessageSink _message_sink;
 
-        public Channel(ChatContext _context, IUpload upload){
+
+        public Channel(ChatContext _context, IUpload upload, IMessageSink message_sink){
             this.context = _context;
             this.upload = upload;
+            this._message_sink = message_sink;
         }
-        public string addMessage(string ChannelID, CreateMessage NewChannelMessage)
+        public async Task<string> addMessage(string ChannelID, CreateMessage NewChannelMessage)
         {
             string message_id = Utils.GenerateUniqueID("msg");
 
@@ -69,6 +72,12 @@ namespace chaos.Services
                 this.upload.addMessageMedia(upload_id, message_id);
             }
 
+            var message = await context.MESSAGE.FirstOrDefaultAsync((msg)=> msg.ID == message_id);
+
+            if(message is not null){
+                await _message_sink.PushAsync(message);
+            }
+
             return message_id;
         }
 
@@ -78,6 +87,14 @@ namespace chaos.Services
             var channel = CreateChannelMapper.Map<Models.Channel>(NewChannelData);
             channel.ID = channel_id;
             this.context.CHANNEL.Add(channel);
+            
+            string participant_id = Utils.GenerateUniqueID("prt");
+            this.context.PARTICIPANT.Add(new(){
+                ChannelID = channel.ID,
+                UserID = channel.CreatorID,
+                ID = participant_id
+            });
+            
             this.context.SaveChanges();
             return channel_id;
         }
