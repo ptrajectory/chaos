@@ -18,7 +18,7 @@ namespace chaos.Services
 
         public GetChannel? updateChannel(string ChannelID, UpdateChannel  UpdatedChannelData);
 
-        public string addMessage(string ChannelID, CreateMessage NewChannelMessage);
+        public Task<string> addMessage(string ChannelID, CreateMessage NewChannelMessage);
 
         public GetMessage? getMessage(string MessageID);
 

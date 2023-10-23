@@ -18,10 +18,10 @@ public class AuthServive : IAuthService
         this._context = context;
     }
 
-    public GetAccessToken generateAccessToken(string APP_ID, string environment, string user_id)
+    public GetAccessToken generateAccessToken(string APP_ID, string environment, string? user_id)
     {
 
-        var user = _context.USER.FirstOrDefault((u)=>u.AppID == APP_ID && u.ID == user_id) ?? throw new Exception("User doesnt belong to the specified app");
+        // var user = _context.USER.FirstOrDefault((u)=>u.AppID == APP_ID && u.ID == user_id) ?? throw new Exception("User doesnt belong to the specified app");
 
 
         var rsaKey = RSA.Create();
@@ -31,14 +31,22 @@ public class AuthServive : IAuthService
 
         var handler = new JsonWebTokenHandler();
 
-        var token = handler.CreateToken(new SecurityTokenDescriptor(){
-            Subject = new ClaimsIdentity(new [] {
+        var subject = new ClaimsIdentity(new [] {
                 new Claim("owner",APP_ID),
                 new Claim("environment", environment),
                 new Claim("scope", "resources"),
-                new Claim("user", user_id),
+                // new Claim("user", user_id ?? "__"),
                 new Claim("expires", DateTime.UtcNow.AddMinutes(60).ToString())
-            }),
+            });
+        
+        if(user_id is not null){
+            subject.AddClaim(
+                new Claim("user", user_id)
+            );
+        }
+
+        var token = handler.CreateToken(new SecurityTokenDescriptor(){
+            Subject = subject,
             SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256),
             Expires= DateTime.UtcNow.AddMinutes(60)
         }); 

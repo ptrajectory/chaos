@@ -32,6 +32,16 @@ var supabaseOptions = new Supabase.SupabaseOptions
 
 // Add services to the container.
 
+builder.Services.AddCors((options)=>{
+
+    options.AddPolicy("AllowAllOrigins", (builder)=>{
+        builder.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(o => {
     o.Events = new JwtBearerEvents(){
@@ -90,7 +100,14 @@ builder.Services.AddScoped<IOrganization, chaos.Services.Organization>();
 builder.Services.AddScoped<IApps, chaos.Services.App>();
 builder.Services.AddScoped<IAuthService, AuthServive>();
 builder.Services.AddScoped<AppResourcesAccessFilter>();
+builder.Services.AddSingleton<IMessageSink, MessageService>();
+builder.Services.AddHostedService(sp => {
+    var sink = sp.GetService<IMessageSink>();
+    return (MessageService)sink!; // TODO: figure out how to fix this
+});
 builder.Services.AddSingleton<IUserIdProvider, ChatHubIDProvider>();
+
+
 builder.Services.AddSignalR(o => {
     o.AddFilter<ChatHubFilter>();
 });
@@ -115,6 +132,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 var app = builder.Build();
+
+app.UseCors("AllowAllOrigins");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
